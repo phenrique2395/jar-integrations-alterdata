@@ -28,11 +28,17 @@ public class ActionExecutionTest {
                         if(columnName.equals("debug")){
                             return "true";
                         }
-                        if(columnName.equals("id")){
-                            return "table_test";
+                        if (columnName.equals("id")) {
+                            return "titulosareceber";
+                        }
+                        if (columnName.equals("dataCadastroInicial")) {
+                            return "2024-01-01";
+                        }
+                        if (columnName.equals("dataCadastroFinal")) {
+                            return "2025-01-01";
                         }
                         if(columnName.equals("apiUrl")){
-                            return "https://api.exactspotter.com/v3/LeadsAndPersons?$skip={0,number,#}&$filter=stage eq ''Agendados''";
+                            return "https://512499bimerapi.alterdata.cloud/api/titulosAReceber?limite={limite}&pagina={pagina}&dataCadastroInicial={dataCadastroInicial}&dataCadastroFinal={dataCadastroFinal}&identificadorPessoa={identificadorPessoa}&codigoEmpresa={codigoEmpresa}&dataVencimentoInicial={dataVencimentoInicial}&dataVencimentoFinal={dataVencimentoFinal}";
                         }
                         return null;
                     }
@@ -44,16 +50,57 @@ public class ActionExecutionTest {
                         if(columnName.equals("debug")){
                             return "true";
                         }
-                        if(columnName.equals("id")){
-                            return "table_test_agendamentos";
+                        if (columnName.equals("id")) {
+                            return "planosdecontas";
                         }
                         if(columnName.equals("apiUrl")){
-                            return "https://api.exactspotter.com/v3/meetings?$skip={0,number,#}&$filter=type eq ''Vigente''";
+                            return "https://512499bimerapi.alterdata.cloud/api/naturezasLancamento";
                         }
                         return null;
                     }
                 };
                 list.add(sourceData2);
+
+                SourceData sourceData3 = new SourceData() {
+                    @Override
+                    public Object getField(String columnName) {
+                        if(columnName.equals("debug")){
+                            return "true";
+                        }
+                        if (columnName.equals("id")) {
+                            return "titulosapagar";
+                        }
+                        if (columnName.equals("dataCadastroInicial")) {
+                            return "2024-01-01";
+                        }
+                        if (columnName.equals("dataCadastroFinal")) {
+                            return "2025-01-01";
+                        }
+                        if(columnName.equals("apiUrl")){
+                            return "https://512499bimerapi.alterdata.cloud/api/titulosAPagar?limite={limite}&pagina={pagina}&dataCadastroInicial={dataCadastroInicial}&dataCadastroFinal={dataCadastroFinal}&identificadorPessoa={identificadorPessoa}&codigoEmpresa={codigoEmpresa}&dataVencimentoInicial={dataVencimentoInicial}&dataVencimentoFinal={dataVencimentoFinal}";
+                        }
+                        return null;
+                    }
+                };
+                list.add(sourceData3);
+
+                SourceData sourceData4 = new SourceData() {
+                    @Override
+                    public Object getField(String columnName) {
+                        if(columnName.equals("debug")){
+                            return "true";
+                        }
+                        if (columnName.equals("id")) {
+                            return "departamento";
+                        }
+                        if(columnName.equals("apiUrl")){
+                            return "https://512499bimerapi.alterdata.cloud/api/centros-de-custo";
+                        }
+                        return null;
+                    }
+                };
+                list.add(sourceData4);
+
                 return list;
             }
 

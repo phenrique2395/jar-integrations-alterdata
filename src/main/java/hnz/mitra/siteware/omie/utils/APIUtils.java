@@ -1,40 +1,33 @@
 package hnz.mitra.siteware.omie.utils;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import hnz.mitra.siteware.omie.models.APIError;
 import hnz.mitra.siteware.omie.models.AccessParams;
 import hnz.mitra.siteware.omie.service.APISourceService;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
 public class APIUtils {
 
-    private final Integer MAX_REQUISITIONS_PER_MINUTE=1;
-    private ArrayList<Long> requisitionsPerMinute;
-    private LinkedList<Long> requisitionsPerSecond;
     private final Integer MAX_TRIES=1;
 
-    public APIUtils(){
-        this.requisitionsPerMinute = new ArrayList<>();
-        this.requisitionsPerSecond = new LinkedList<>();
-    }
+    public APIUtils(){}
 
-    public String executeRequest(AccessParams accessParams, String id, Integer nextIntegerPageToSkip, String apiUrl) throws IOException, InterruptedException, URISyntaxException {
+    public String executeRequest(AccessParams accessParams, String id, Integer nextIntegerPageToSkip, String apiUrl)
+     throws IOException, InterruptedException, URISyntaxException {
+        String accessToken = makeAuthenticationRequest(accessParams);
         int tries = 1;
         String result = null;
         String errorResult;
-        MessageFormat mf = new MessageFormat(apiUrl);
         while(result == null){
-            URL url = getUrl(mf, nextIntegerPageToSkip);
+            URL url = new URL(apiUrl.replace("{pagina}", String.valueOf(nextIntegerPageToSkip)));
             errorResult = null;
             Response response = null;
             PrintUtils.printDebug("Request URL: " + url);
@@ -46,8 +39,9 @@ public class APIUtils {
             Request request = new Request.Builder()
                     .url(url)
                     .method("GET", null)
-                    .addHeader("token_exact", accessParams.getToken())
                     .addHeader("Content-Type", "application/json")
+                    .addHeader("Accept", "application/json")
+                    .addHeader("Authorization", "Bearer " + accessToken)
                     .build();
             try{
                 response = client.newCall(request).execute();
@@ -74,12 +68,33 @@ public class APIUtils {
         return result;
     }
 
-    private static URL getUrl(MessageFormat mf, Integer nextIntegerPageToSkip) throws MalformedURLException {
-        return new URL(mf.format(new Object[]{nextIntegerPageToSkip}));
-    }
+    private String makeAuthenticationRequest(AccessParams accessParams) {
+        OkHttpClient client = new OkHttpClient().newBuilder()
+         .connectTimeout(10, TimeUnit.MINUTES)
+         .writeTimeout(30, TimeUnit.MINUTES)
+         .readTimeout(30, TimeUnit.MINUTES)
+         .build();
 
-    private byte[] buildBody(String id, String query) {
-        MessageFormat mf = new MessageFormat("'{'\"id\":\"{0}\",\"query\": \"{1}\"'}'");
-        return mf.format(new Object[]{id,query}).getBytes();
+        RequestBody formBody = new FormBody.Builder()
+         .add("username", accessParams.getUserName())
+         .add("password", accessParams.getPassword())
+         .build();
+
+        Request request = new Request.Builder()
+         .url(accessParams.getUrl())
+         .post(formBody)
+         .addHeader("Content-Type", "application/x-www-form-urlencoded")
+         .build();
+
+        try {
+            PrintUtils.printDebug("Executing authentication request");
+            Response execute = client.newCall(request).execute();
+            assert execute.body() != null;
+            JsonObject jsonObject = new JsonParser().parse(execute.body().string()).getAsJsonObject();
+            PrintUtils.printDebug("Successfully executed authentication request");
+            return jsonObject.get("accessToken").getAsString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

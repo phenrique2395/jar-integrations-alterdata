@@ -14,7 +14,7 @@ public abstract class APISource {
     protected String description;
     protected APISource next;
 
-    public abstract void validadeSourceParams(Object param);
+    public abstract void validateSourceParams(Object param);
 
     public abstract void process(JsonObject data, Object param) throws SQLException, ParseException;
 

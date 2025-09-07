@@ -4,17 +4,19 @@ import com.google.gson.annotations.SerializedName;
 
 public class AccessParams {
 
-	@SerializedName(value = "TOKEN")
-	private String token;
+	@SerializedName(value = "USENAME")
+	private String userName;
 	@SerializedName(value = "URL")
 	private String url;
+	@SerializedName(value = "PASSWORD")
+	private String password;
 
-	public String getToken() {
-		return token;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setToken(String token) {
-		this.token = token;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 	public String getUrl() {
@@ -23,5 +25,13 @@ public class AccessParams {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 }

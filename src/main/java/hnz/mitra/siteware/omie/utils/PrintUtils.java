@@ -13,7 +13,7 @@ public class PrintUtils {
     private static DateTimeFormatter defaultDateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     private static String description;
     private static String system;
-    public static String defaultPrintTitle ="<Thread "+Thread.currentThread().getName()+"> Tv Integração Exact Sales Integration Step JAR - "+ (!Objects.isNull(system)?"System "+system:"")+" : ";
+    public static String defaultPrintTitle ="<Thread "+Thread.currentThread().getName()+"> Alter Data Integration Step JAR - "+ (!Objects.isNull(system)?"System "+system:"")+" : ";
     public static Boolean debug;
 
     public static void setApiSource(APISource apiSource) {

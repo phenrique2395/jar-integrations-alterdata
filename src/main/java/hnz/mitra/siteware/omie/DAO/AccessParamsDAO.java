@@ -1,6 +1,5 @@
 package hnz.mitra.siteware.omie.DAO;
 
-import com.google.gson.Gson;
 import hnz.mitra.siteware.omie.models.AccessParams;
 import hnz.mitra.siteware.omie.utils.PrintUtils;
 
@@ -13,7 +12,6 @@ import java.util.Objects;
 public class AccessParamsDAO {
 
     private Connection connection;
-    private Gson gson = new Gson();
 
     public AccessParamsDAO(Connection connection){
         this.connection = connection;
@@ -30,8 +28,9 @@ public class AccessParamsDAO {
             PrintUtils.printDebug("Query for retrieving API Access Params from DataBase: "+statement.toString());
             rs = statement.executeQuery();
             rs.next();
-            accessParams.setToken(rs.getString("TOKEN"));
+            accessParams.setUserName(rs.getString("USERNAME"));
             accessParams.setUrl(rs.getString("URL"));
+            accessParams.setPassword(rs.getString("PASSWORD"));
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

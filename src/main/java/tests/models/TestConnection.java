@@ -12,7 +12,7 @@ public class TestConnection {
     private String username="root";
     private String password="ttCHANGE123";
 //    private String driverClass="org.mysql.Driver";
-    private String driverClass="com.mysql.cj.jdbc.Driver";
+//    private String driverClass="com.mysql.cj.jdbc.Driver";
     private Connection connection;
 
     public TestConnection(){

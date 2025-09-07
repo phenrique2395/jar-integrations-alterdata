@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import hnz.mitra.siteware.omie.DAO.APIErrorDAO;
 import hnz.mitra.siteware.omie.DAO.AccessParamsDAO;
-import hnz.mitra.siteware.omie.DAO.DdlDAO;
 import hnz.mitra.siteware.omie.models.APIError;
 import hnz.mitra.siteware.omie.models.APISource;
 import hnz.mitra.siteware.omie.models.AccessParams;
@@ -17,8 +16,6 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 public class APISourceService {
     private static ActionContext actionContext;
@@ -45,20 +42,21 @@ public class APISourceService {
         DdlService ddlService = new DdlService(actionContext);
         try {
             for(HashMap<String,String> params: (ArrayList<HashMap<String,String>>)persistentParams.get("queries")) {
-                apiSource.validadeSourceParams(params);
+                apiSource.validateSourceParams(params);
                 String id = params.get("id");
                 String apiUrl = params.get("apiUrl");
+                apiUrl = replaceUrlParamsIfNeeded(apiUrl, params);
                 Boolean tableAlreadyExists = ddlService.truncateIfExists(id);
                 if (!Boolean.TRUE.equals(tableAlreadyExists)) ddlService.createTable(id);
-                int nextIntegerPageToSkip = 0;
+                int nextPageNumber = 1;
                 boolean hasNextCall = Boolean.TRUE;
                 while (hasNextCall) {
-                    PrintUtils.printDebug("Executing request skipping next " + nextIntegerPageToSkip + " lines");
-                    String json = apiUtils.executeRequest(accessParams, id, nextIntegerPageToSkip, apiUrl);
+                    PrintUtils.printDebug("Executing request skipping next " + nextPageNumber + " lines");
+                    String json = apiUtils.executeRequest(accessParams, id, nextPageNumber, apiUrl);
                     JsonObject resultJson = new JsonParser().parse(json).getAsJsonObject();
                     apiSource.process(resultJson, params);
-                    hasNextCall = !(resultJson.get("value").getAsJsonArray().isJsonNull() || resultJson.get("value").getAsJsonArray().size() == 0);
-                    nextIntegerPageToSkip += 500;
+                    nextPageNumber += 1;
+                    hasNextCall = isHasNextCall(resultJson, nextPageNumber);
                 }
             }
         }catch(Exception e ){
@@ -72,5 +70,24 @@ public class APISourceService {
         }
         PrintUtils.durationDebug("Finished requisition execution",executionStart);
         apiSource.callNext();
+    }
+
+    private static String replaceUrlParamsIfNeeded(String apiUrl, HashMap<String, String> params) {
+        return apiUrl
+         .replace("{limite}", params.get("limite"))
+         .replace("{dataCadastroInicial}", params.get("dataCadastroInicial"))
+         .replace("{dataCadastroFinal}", params.get("dataCadastroFinal"))
+         .replace("{codigoEmpresa}", params.get("codigoEmpresa"))
+         .replace("{identificadorPessoa}", params.get("identificadorPessoa"))
+         .replace("{dataVencimentoInicial}", params.get("dataVencimentoInicial"))
+         .replace("{dataVencimentoFinal}", params.get("dataVencimentoFinal"));
+    }
+
+    private static boolean isHasNextCall(JsonObject resultJson, int currentPage) {
+        if(resultJson.get("Paginacao") == null){
+            return false;
+        }
+
+        return resultJson.get("Paginacao").getAsJsonObject().get("TotalPagina").getAsInt() >= currentPage;
     }
 }

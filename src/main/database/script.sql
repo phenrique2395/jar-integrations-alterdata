@@ -1,9 +1,10 @@
 CREATE TABLE ACCESS_PARAMS(
-    TOKEN VARCHAR(500),
+    USERNAME VARCHAR(500),
+    PASSWORD VARCHAR(500),
     URL VARCHAR(100)
 );
 
-INSERT INTO ACCESS_PARAMS VALUES ('e8a9e5af-0dbf-40ca-9741-133b89160332','https://api.exactspotter.com/v3/LeadsAndPersons$skip={0,number,#}');
+INSERT INTO ACCESS_PARAMS VALUES ('Apibimer','12345678', 'https://512499bimerapi.alterdata.cloud/auth/token');
 
 CREATE TABLE ERROR_LOG(
     OCURRENCEDATE TIMESTAMP,
